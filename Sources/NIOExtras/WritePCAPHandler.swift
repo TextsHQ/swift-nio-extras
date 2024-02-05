@@ -14,6 +14,8 @@
 
 #if canImport(Darwin)
 import Darwin
+#elseif canImport(Musl)
+import Musl
 #else
 import Glibc
 #endif
@@ -681,7 +683,6 @@ extension NIOWritePCAPHandler {
             self.errorHandler = errorHandler
         }
 
-        #if swift(>=5.7)
         /// Synchronously close this `SynchronizedFileSink` and any associated resources.
         ///
         /// After use, it is mandatory to close a `SynchronizedFileSink` exactly once. `syncClose` may be called from
@@ -690,15 +691,6 @@ extension NIOWritePCAPHandler {
         public func syncClose() throws {
             try self._syncClose()
         }
-        #else
-        /// Synchronously close this `SynchronizedFileSink` and any associated resources.
-        ///
-        /// After use, it is mandatory to close a `SynchronizedFileSink` exactly once. `syncClose` may be called from
-        /// any thread but not from an `EventLoop` as it will block, and may not be called from an async context.
-        public func syncClose() throws {
-            try self._syncClose()
-        }
-        #endif
 
         private func _syncClose() throws {
             self.writesGroup.wait()
